@@ -1,13 +1,14 @@
-name: Sandbox
+name: Build .NET project 🏗
 
 on: [push, pull_request]
 
 jobs:
   buildProject:
-    name: Build for ${{ matrix.targetPlatform }}
+    name: Build .NET project
     runs-on: mcr.microsoft.com/dotnet/sdk:6.0
     strategy:
       fail-fast: false
+
     steps:
       - uses: actions/checkout@v2
         with:
