@@ -1,0 +1,22 @@
+name: Sandbox
+
+on: [push, pull_request]
+
+jobs:
+  buildProject:
+    name: Build for ${{ matrix.targetPlatform }}
+    runs-on: mcr.microsoft.com/dotnet/sdk:6.0
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          lfs: true
+      - name: Build .NET 6 application
+        run: dotnet build -c Release -o build
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: SeleniumLoadingTracker
+          path: build

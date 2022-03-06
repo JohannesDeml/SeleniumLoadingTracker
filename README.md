@@ -1,8 +1,8 @@
 # Selenium Loading Tracker
 
-*Measure loading times of predefined divs with selenium*
+*Measure loading times of predefined divs with selenium webdriver*
 
-[![Releases](https://img.shields.io/github/release/JohannesDeml/NetworkBenchmarkDotNet/all.svg)](../../releases) [![.NET 6.0](https://img.shields.io/badge/.NET-6.0-blueviolet.svg)](https://dotnet.microsoft.com/download/dotnet/6.0)
+[![Releases](https://github.com/JohannesDeml/SeleniumLoadingTracker/all.svg)](../../releases) [![.NET 6.0](https://img.shields.io/badge/.NET-6.0-blueviolet.svg)](https://dotnet.microsoft.com/download/dotnet/6.0)
 
 ## Description
 
@@ -14,8 +14,6 @@ The website you want to track needs to have certain tracking structure. That is,
 ![Div structure screenshot](C:\Data\Documents\CSharp\Own\SeleniumLoadingTracker\Docs\tracking-div-structure.png)
 
 This gives a very high flexibility on what you want to track, since it can be easily triggered from the client, no matter in which environment you are.
-
-This program also comes with a lot of settings to define what you want to track, how often you want to run the website, etc.
 
 #### Command-line Options (`./SeleniumLoadingTracker--help`)
 ```
