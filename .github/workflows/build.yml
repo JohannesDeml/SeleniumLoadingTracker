@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   buildProject:
     name: Build .NET project
-    runs-on: mcr.microsoft.com/dotnet/sdk:6.0
+    runs-on: mcr.microsoft.com/dotnet/sdk:latest
     strategy:
       fail-fast: false
 
