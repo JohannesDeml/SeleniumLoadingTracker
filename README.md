@@ -11,11 +11,11 @@ The program opens a website a defined number of times and looks out for specifie
 ## Usage
 The website you want to track needs to have certain tracking structure. That is, a `#tracking` div, in which all `#tracking-{name}` values can be found. Inside  `#tracking-{name}` there needs to be another `.tracking-milliseconds` entry that contains the number of milliseconds you want to pass there. Normally, you will set this to `performance.now()`. 
 
-![Div structure screenshot](C:\Data\Documents\CSharp\Own\SeleniumLoadingTracker\Docs\tracking-div-structure.png)
+![Div structure screenshot](./Docs/tracking-div-structure.png)
 
 This gives a very high flexibility on what you want to track, since it can be easily triggered from the client, no matter in which environment you are.
 
-#### Command-line Options (`./SeleniumLoadingTracker--help`)
+#### Command-line Options (`./SeleniumLoadingTracker --help`)
 ```
 Usage:
   SeleniumLoadingTracker [options]
