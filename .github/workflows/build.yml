@@ -15,14 +15,38 @@ jobs:
         with:
           fetch-depth: 0
           lfs: true
+          
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
-        uses: actions/setup-dotnet@v1.7.2
+        uses: actions/setup-dotnet@v2
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
+          
       - name: Build .NET ${{ matrix.dotnet-version }} application
-        run: dotnet build -c Release -o builds/${{ matrix.dotnet-version }}
-
+        run: dotnet build -c Release -o builds/${{ matrix.dotnet-version }}/SeleniumLoadingTracker
+        
       - uses: actions/upload-artifact@v2
         with:
           name: SeleniumLoadingTracker
           path: builds/${{ matrix.dotnet-version }}
+
+  release:
+    needs: [ buildProject ]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - name: Get tag version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        
+      - uses: actions/download-artifact@v2
+        with:
+          name: SeleniumLoadingTracker
+        
+      - name: Zip release
+        run: zip -r SeleniumLoadingTracker-${{ steps.get_version.outputs.VERSION }}.zip SeleniumLoadingTracker
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: SeleniumLoadingTracker-${{ steps.get_version.outputs.VERSION }}.zip
