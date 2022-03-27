@@ -2,7 +2,7 @@
 
 *Measure loading times of predefined divs with selenium webdriver*
 
-[![Releases](https://github.com/JohannesDeml/SeleniumLoadingTracker/all.svg)](../../releases) [![.NET 6.0](https://img.shields.io/badge/.NET-6.0-blueviolet.svg)](https://dotnet.microsoft.com/download/dotnet/6.0)
+[![Releases](https://img.shields.io/github/release-date/JohannesDeml/SeleniumLoadingTracker.svg)](../../releases) [![.NET 6.0](https://img.shields.io/badge/.NET-6.0-blueviolet.svg)](https://dotnet.microsoft.com/download/dotnet/6.0)
 
 ## Description
 
