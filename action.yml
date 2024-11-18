@@ -1,0 +1,65 @@
+name: 'WebGL Loading Time Tracker'
+description: 'Measures loading times of WebGL applications using Selenium'
+inputs:
+  url:
+    description: 'URL to benchmark'
+    required: true
+  tracking-points:
+    description: 'Tracking points to measure (space-separated)'
+    required: true
+    default: 'Awake Start'
+  warmup-runs:
+    description: 'Number of warmup runs'
+    required: false
+    default: '2'
+  measurement-runs:
+    description: 'Number of measurement runs'
+    required: false
+    default: '10'
+  website-culture-code:
+    description: 'Culture used on the website to create the number strings'
+    required: false
+    default: 'en-US'
+  headless:
+    description: 'Run in headless mode'
+    required: false
+    default: 'true'
+  verbose:
+    description: 'Enable verbose logging'
+    required: false
+    default: 'false'
+outputs:
+  results-path:
+    description: 'Path to the JSON file containing benchmark results'
+    value: ${{ steps.benchmark.outputs.results-path }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Install Chrome
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y chromium-browser
+      shell: bash
+
+    - name: Build project
+      run: dotnet build ${{ github.action_path }}/SeleniumLoadingTracker/SeleniumLoadingTracker.csproj
+      shell: bash
+
+    - name: Run benchmark
+      id: benchmark
+      run: |
+        dotnet run --project ${{ github.action_path }}/SeleniumLoadingTracker/SeleniumLoadingTracker.csproj -- \
+          --url "${{ inputs.url }}" \
+          --tracking-points "${{ inputs.tracking-points }}" \
+          --warmup-runs ${{ inputs.warmup-runs }} \
+          --measurement-runs ${{ inputs.measurement-runs }} \
+          --website-culture-code "${{ inputs.website-culture-code }}" \
+          --headless ${{ inputs.headless }} \
+          --verbose ${{ inputs.verbose }}
+        echo "results-path=$(pwd)/benchmark-results.json" >> $GITHUB_OUTPUT
+      shell: bash 
