@@ -35,13 +35,17 @@ public static class Program
 	private static void Run(ProgramConfiguration config)
 	{
 		Console.WriteLine($"Running loading tracker for {config.Url}");
-			
+
 		WebDriver driver = WebDriverConfigurator.ConfigureChromeDriver(config);
 		var trackingCollector = new TrackingCollector(driver, config);
 
 		trackingCollector.RunWarmup();
 		trackingCollector.RunMeasurements();
 		trackingCollector.LogResults();
+
+		string resultPath = "benchmark-results.json";
+		trackingCollector.SaveResultsToJson(resultPath);
+
 		driver.Quit();
 	}
 }

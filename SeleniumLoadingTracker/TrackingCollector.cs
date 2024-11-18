@@ -12,6 +12,7 @@ using System.Globalization;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumLoadingTracker.Configuration;
+using System.Text.Json;
 
 namespace SeleniumLoadingTracker;
 
@@ -23,17 +24,32 @@ public class TrackingCollector
 {
 	private WebDriver _driver;
 	private ITrackingConfiguration _config;
-		
+
 	private Dictionary<string, List<float>> _warmup;
 	private Dictionary<string, List<float>> _measurements;
+	private BenchmarkResult _result;
 
 	public TrackingCollector(WebDriver driver, ITrackingConfiguration config)
 	{
 		_driver = driver;
 		_config = config;
-			
+
 		_warmup = new Dictionary<string, List<float>>();
 		_measurements = new Dictionary<string, List<float>>();
+		_result = new BenchmarkResult
+		{
+			Url = config.Url,
+			Timestamp = DateTime.UtcNow,
+			Configuration = new BenchmarkConfiguration
+			{
+				WarmupRuns = config.WarmupRuns,
+				MeasurementRuns = config.MeasurementRuns,
+				TrackingPoints = config.TrackingPointsArray,
+				WebsiteCultureCode = config.WebsiteCulture.Name
+			},
+			WarmupResults = new List<TrackingPointResult>(),
+			MeasurementResults = new List<TrackingPointResult>()
+		};
 	}
 
 	/// <summary>
@@ -48,7 +64,7 @@ public class TrackingCollector
 			MeasureLoadingTime(ref _warmup);
 		}
 	}
-	
+
 	/// <summary>
 	/// Runs all measurements for the website. This is the main loop to generate the loading time information
 	/// </summary>
@@ -115,5 +131,32 @@ public class TrackingCollector
 			var averageTime = dataPoint.Value.Average();
 			Console.WriteLine($"{trackingName}: {averageTime}ms ({dataPoint.Value.Count} data points)");
 		}
+	}
+
+	public void SaveResultsToJson(string filePath)
+	{
+		_result.WarmupResults = CreateTrackingPointResults(_warmup);
+		_result.MeasurementResults = CreateTrackingPointResults(_measurements);
+
+		var options = new JsonSerializerOptions { WriteIndented = true };
+		string jsonString = JsonSerializer.Serialize(_result, options);
+		File.WriteAllText(filePath, jsonString);
+	}
+
+	private List<TrackingPointResult> CreateTrackingPointResults(Dictionary<string, List<float>> dataPoints)
+	{
+		var results = new List<TrackingPointResult>();
+		foreach (var dataPoint in dataPoints)
+		{
+			results.Add(new TrackingPointResult
+			{
+				Name = dataPoint.Key,
+				AverageTime = dataPoint.Value.Average(),
+				MinTime = dataPoint.Value.Min(),
+				MaxTime = dataPoint.Value.Max(),
+				Samples = dataPoint.Value
+			});
+		}
+		return results;
 	}
 }
