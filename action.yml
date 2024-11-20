@@ -1,9 +1,13 @@
 name: 'WebGL Loading Time Tracker'
 description: 'Measures loading times of WebGL applications using Selenium'
 inputs:
-  url:
-    description: 'URL to benchmark'
+  artifact-path:
+    description: 'Path to the WebGL build artifacts'
     required: true
+  port:
+    description: 'Port to run the local server on'
+    required: false
+    default: '8080'
   tracking-points:
     description: 'Tracking points to measure (space-separated)'
     required: true
@@ -43,7 +47,16 @@ runs:
     - name: Install Chrome
       run: |
         sudo apt-get update
-        sudo apt-get install -y chromium-browser
+        sudo apt-get install -y chromium-browser python3
+      shell: bash
+
+    - name: Start local server
+      run: |
+        cd ${{ inputs.artifact-path }}
+        python3 -m http.server ${{ inputs.port }} &
+        echo "SERVER_PID=$!" >> $GITHUB_ENV
+        # Wait for server to start
+        sleep 2
       shell: bash
 
     - name: Build project
@@ -54,7 +67,7 @@ runs:
       id: benchmark
       run: |
         dotnet run --project ${{ github.action_path }}/SeleniumLoadingTracker/SeleniumLoadingTracker.csproj -- \
-          --url "${{ inputs.url }}" \
+          --url "http://localhost:${{ inputs.port }}" \
           --tracking-points "${{ inputs.tracking-points }}" \
           --warmup-runs ${{ inputs.warmup-runs }} \
           --measurement-runs ${{ inputs.measurement-runs }} \
@@ -62,4 +75,12 @@ runs:
           --headless ${{ inputs.headless }} \
           --verbose ${{ inputs.verbose }}
         echo "results-path=$(pwd)/benchmark-results.json" >> $GITHUB_OUTPUT
-      shell: bash 
+      shell: bash
+
+    - name: Stop local server
+      if: always()
+      run: |
+        if [ ! -z "$SERVER_PID" ]; then
+          kill $SERVER_PID || true
+        fi
+      shell: bash

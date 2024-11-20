@@ -3,10 +3,6 @@ name: Test Action
 on:
   workflow_dispatch:
     inputs:
-      url:
-        description: 'URL to benchmark'
-        required: true
-        default: 'https://deml.io/experiments/unity-webgl/6000.0.27f1-webgl2'
       tracking-points:
         description: 'Tracking points to measure'
         required: true
@@ -26,9 +22,15 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    # Assuming you have a build step that creates your WebGL build
+    - name: Build WebGL
+      run: |
+        mkdir -p build/WebGL
+        cp ExampleSite/index.html build/WebGL/
     - uses: ./
       with:
-        url: ${{ github.event.inputs.url }}
+        artifact-path: build/WebGL
+        port: 8080
         tracking-points: ${{ github.event.inputs.tracking-points }}
         warmup-runs: ${{ github.event.inputs.warmup-runs }}
         measurement-runs: ${{ github.event.inputs.measurement-runs }}
